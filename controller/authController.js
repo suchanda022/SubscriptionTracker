@@ -1,5 +1,6 @@
 const User = require("../model/user.js");
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 const {registerValidation}  = require("../validation");
 
@@ -15,9 +16,6 @@ const registerUser = async(req,res)=>{
     if(phoneExist){
       return res.status(400).send('number already exists');
     }
-
-   
-
    const salt = await bcrypt.genSalt(10);
    const hashedPassword = await bcrypt.hash(req.body.password, salt);
     const user = new User({
@@ -36,12 +34,34 @@ const registerUser = async(req,res)=>{
     res.status(400).send(error);
     
   }
-   
-   
-
-
- 
-
 
 };
-module.exports = { registerUser };
+
+
+const loginUser = async(req,res)=>{
+  const{email,password,phone} = req.body;
+
+  const userFound = await User.findOne({email});
+  if(!userFound){
+   throw new Error ("no user found");
+  }
+  const passwordMatched = await userFound.isPasswordMatched(password);
+  if(!passwordMatched){
+    throw new Error ("not matched");
+
+  }
+
+  let token = await userFound.generateToken();
+  res.json({
+    _id: userFound?._id,
+    firstName : userFound?.firstName,
+    LastName:userFound.lastName,
+    email: userFound?.email,
+    token
+
+  });
+
+  
+
+};
+module.exports = { registerUser,loginUser };
