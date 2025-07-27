@@ -29,8 +29,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-  }
- 
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);

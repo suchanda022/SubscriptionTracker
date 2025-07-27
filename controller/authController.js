@@ -2,7 +2,7 @@ const User = require("../model/user.js");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
-const {registerValidation}  = require("../validation");
+const {registerValidation}  = require("../validations/registerValidation");
 
 const registerUser = async(req,res)=>{
     const {error} = registerValidation(req.body);
@@ -16,8 +16,11 @@ const registerUser = async(req,res)=>{
     if(phoneExist){
       return res.status(400).send('number already exists');
     }
+    
    const salt = await bcrypt.genSalt(10);
    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      
+   
     const user = new User({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -25,7 +28,7 @@ const registerUser = async(req,res)=>{
       phone:req.body.phone,
       password: hashedPassword,
     });
-   
+  
   try {
     const savedUser = await user.save();
     res.send({user: savedUser._id});
@@ -39,15 +42,20 @@ const registerUser = async(req,res)=>{
 
 
 const loginUser = async(req,res)=>{
-  const{email,password,phone} = req.body;
+  const{email,password} = req.body;
 
   const userFound = await User.findOne({email});
   if(!userFound){
    throw new Error ("no user found");
   }
+  console.log("Entered password:", password);
+  console.log("Stored hash in DB:", userFound.password);
+
   const passwordMatched = await userFound.isPasswordMatched(password);
+  console.log("Password matched?", passwordMatched);
   if(!passwordMatched){
     throw new Error ("not matched");
+
 
   }
 
