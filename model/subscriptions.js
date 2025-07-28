@@ -25,7 +25,12 @@ const subscriptionSchema = new mongoose.Schema(
       type: String,
       enum: ["entertainment", "education", "fitness", "cooking", "others"],
       default: "others",
-    }
+    },
+   user: {
+   type: mongoose.Schema.Types.ObjectId,
+   ref: "User",
+   required: true
+}
     
   },
   {
