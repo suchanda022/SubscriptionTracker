@@ -3,6 +3,7 @@ require("dotenv").config();
 const dbConnect = require("./config/db");
 const authRoute = require("./routes/auth");
 const subRoute = require("./routes/subscription");
+const paymentRoute = require("./routes/payment");
 
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 
@@ -22,6 +23,8 @@ app.use("/api/auth", authRoute);
 // sub route
 
 app.use("/api/sub", subRoute);
+
+app.use("/api/payments", paymentRoute);
 
 app.use(errorHandler);
 app.use(notFound);

@@ -1,6 +1,4 @@
 
-
-
 const mongoose  = require("mongoose");
 
 const paymentSchema = new mongoose.Schema({
@@ -35,7 +33,7 @@ const paymentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Paid", "Pending", "Failed"],
+    enum: ["Paid",  "Failed"],
     default: "Paid",
   },
   transactionId: {
