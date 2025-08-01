@@ -35,13 +35,12 @@ const createPayment = asyncHandler(async(req,res)=>{
 const viewPayments = asyncHandler(async(req,res)=>{
   const userId = req.user._id;
   
-  const payments = await paymentModel.find({ userId });
+  const payments = await paymentModel.find({ user:userId });
     // .select("amount subscriptionId createdAt status") // Customize as needed
     // .populate("subscriptionId", "name price"); // Optional: populate subscription info
 
   if (payments.length === 0) {
     return res.status(200).json({
-      success: true,
       message: "You haven't made any payments yet.",
       payments: [],
     });
@@ -54,11 +53,17 @@ const viewPayments = asyncHandler(async(req,res)=>{
   });
   
 
+});
 
-  
+const viewAllPayments = asyncHandler(async(req,res)=>{
+
+
+
 
 
 
 });
+
+
 
 module.exports = { createPayment,viewPayments };
