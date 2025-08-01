@@ -12,7 +12,7 @@ const paymentSchema = new mongoose.Schema({
   },
   subscription: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Subscription",
+    ref: "subscription",
     required: true,
   },
   amount: {
