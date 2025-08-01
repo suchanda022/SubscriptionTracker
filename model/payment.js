@@ -33,8 +33,8 @@ const paymentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Paid",  "Failed"],
-    default: "Paid",
+    enum: ["Success",  "Failed","paid"],
+    default: "success",
   },
   transactionId: {
     type: String,
@@ -44,5 +44,5 @@ const paymentSchema = new mongoose.Schema({
   },
 });
 
-const paymentModel = ("payment",paymentSchema);
+const paymentModel = mongoose.model("payment",paymentSchema);
 module.exports = paymentModel;

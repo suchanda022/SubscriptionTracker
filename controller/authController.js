@@ -42,34 +42,28 @@ const registerUser = async(req,res)=>{
 
 
 const loginUser = async(req,res)=>{
-  const{email,password} = req.body;
+  const { email, password } = req.body;
 
-  const userFound = await User.findOne({email});
-  if(!userFound){
-   throw new Error ("no user found");
+  const userFound = await User.findOne({ email });
+  if (!userFound) {
+    throw new Error("no user found");
   }
-  console.log("Entered password:", password);
-  console.log("Stored hash in DB:", userFound.password);
+
+
 
   const passwordMatched = await userFound.isPasswordMatched(password);
-  console.log("Password matched?", passwordMatched);
-  if(!passwordMatched){
-    throw new Error ("not matched");
 
-
+  if (!passwordMatched) {
+    throw new Error("not matched");
   }
 
   let token = await userFound.generateToken();
   res.json({
     _id: userFound?._id,
-    firstName : userFound?.firstName,
-    LastName:userFound.lastName,
+    firstName: userFound?.firstName,
+    LastName: userFound.lastName,
     email: userFound?.email,
-    token
-
+    token,
   });
-
-  
-
 };
 module.exports = { registerUser,loginUser };

@@ -7,44 +7,37 @@ const submodel  = require("../model/subscriptions");
 
 
 const createPayment = asyncHandler(async(req,res)=>{
- const {subscription} = req.body;
+  const {subName} = req.body;
 
- const userID = req.user._id;
+  const userID = req.user._id;
 
- const sub = await submodel.findById(subscription);
- if(!sub){
-    return res.status(404).json({message:"subscription not found"});
-
- }
- if (sub.user.toString() !== userID.toString()) {
-    return res.status(404).json({message:"user didn't match"});
- } 
- const frequency = sub.frequency;
- const amount = sub.amount ;
-
- const paymentSuccess = await simulatePayment();
- if(!paymentSuccess) return res.status().json({message:"payment failed"});
-
+  const sub = await submodel.findOne({subName,user:userID});
+  if (!sub) {
+     res.status(404).json({ message: "subscription not found for this user" });
+  }
+  const{amount,_id:subscriptionId} = sub;
  
- const payment = await paymentModel.create({  // used create here instead of save because we do not need to change the document after saving
-    user : userID,
-    subscription,
-    amount,
-    paymentDate,
-    status:"completed",
- });
- return res.status(200).json({ message: "payment created" });
 
-  
+  const paymentSuccess = await simulatePayment();
+  if (!paymentSuccess) return res.status().json({ message: "payment failed" });
+
+  // used create here instead of save because we do not need to change the document after saving
+  const payment = await paymentModel.create({
+    user: userID,
+    subscription : subscriptionId,
+    amount,
+    status: "paid",
+  });
+   res.status(200).json({ message: "payment is successful" });
 });
 
 
 const viewPayments = asyncHandler(async(req,res)=>{
   const userId = req.user._id;
   
-  const payments = await Payment.find({ userId })
-    .select("amount subscriptionId createdAt status") // Customize as needed
-    .populate("subscriptionId", "name price"); // Optional: populate subscription info
+  const payments = await paymentModel.find({ userId });
+    // .select("amount subscriptionId createdAt status") // Customize as needed
+    // .populate("subscriptionId", "name price"); // Optional: populate subscription info
 
   if (payments.length === 0) {
     return res.status(200).json({
