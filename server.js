@@ -5,6 +5,7 @@ const authRoute = require("./routes/auth");
 const subRoute = require("./routes/subscription");
 const paymentRoute = require("./routes/payment");
 
+
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 
 const app = express();

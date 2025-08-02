@@ -28,7 +28,25 @@ const createPayment = asyncHandler(async(req,res)=>{
     amount,
     status: "paid",
   });
+
    res.status(200).json({ message: "payment is successful" });
+
+   const subscription = await submodel.findById(subscriptionId);
+
+   let nextDate = new Date();
+   if (subscription.frequency === "weekly") {
+     nextDate.setDate(nextDate.getDate() + 7);
+   } else if (subscription.frequency === "monthly") {
+     nextDate.setMonth(nextDate.getMonth() + 1);
+   } else if (subscription.frequency === "yearly") {
+     nextDate.setFullYear(nextDate.getFullYear() + 1);
+   }
+
+
+   
+
+  subscription.expireyDate = nextDate ;
+  await subscription.save();
 });
 
 
