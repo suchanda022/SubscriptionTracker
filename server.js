@@ -4,13 +4,16 @@ const dbConnect = require("./config/db");
 const authRoute = require("./routes/auth");
 const subRoute = require("./routes/subscription");
 const paymentRoute = require("./routes/payment");
+const {runReminderCron} = require("./cronjobs/reminder");
 
 
 const { errorHandler, notFound } = require("./middleware/errorHandler");
+const { required } = require("joi");
 
 const app = express();
 
 app.use(express.json());
+
 
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.url}`);
@@ -18,6 +21,7 @@ app.use((req, res, next) => {
 });
 
 dbConnect();
+runReminderCron();
 
 app.use("/api/auth", authRoute);
 

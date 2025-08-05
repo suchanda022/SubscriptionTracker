@@ -4,7 +4,9 @@ const asyncHandler = require("express-async-handler");
 const { errorhandler, notFound } = require("../middleware/errorHandler");
 const simulatePayment = require("../utils/mockPayment");
 const submodel  = require("../model/subscriptions");
-const {sendPaymentSuccessEmail} = require("../utils/sendEmails")
+const sendEmail = require("../utils/sendEmails");
+const User = require("../model/user");
+
 
 
 const createPayment = asyncHandler(async(req,res)=>{
@@ -46,7 +48,17 @@ const createPayment = asyncHandler(async(req,res)=>{
   subscription.expireyDate = nextDate;
   await subscription.save();
 
-   await sendPaymentSuccessEmail(user, subscription);
+   await sendEmail({
+     to: user.email,
+     subject: "Payment Successful - Receipt",
+     templateName: "paymentSuccess.html",
+     placeholders: {
+       firstName: user.firstName,
+       subName: subscription.subName,
+       amount: subscription.amount,
+       nextDate:subscription.expireyDate
+     },
+   });
    console.log(`payment success email is sent to ${user.email}`);
 
    res.status(200).json({ message: "payment is successful" });
