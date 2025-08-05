@@ -19,7 +19,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
     expireyDate: {
       type: Date,
-      required: true,
+      
     },
     category: {
       type: String,

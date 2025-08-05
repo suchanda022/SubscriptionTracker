@@ -4,12 +4,16 @@ const asyncHandler = require("express-async-handler");
 const { errorhandler, notFound } = require("../middleware/errorHandler");
 const simulatePayment = require("../utils/mockPayment");
 const submodel  = require("../model/subscriptions");
+const {sendPaymentSuccessEmail} = require("../utils/sendEmails")
 
 
 const createPayment = asyncHandler(async(req,res)=>{
   const {subName} = req.body;
 
   const userID = req.user._id;
+
+  const user = req.user;
+ 
 
   const sub = await submodel.findOne({subName,user:userID});
   if (!sub) {
@@ -28,25 +32,24 @@ const createPayment = asyncHandler(async(req,res)=>{
     amount,
     status: "paid",
   });
+  const subscription = await submodel.findById(subscriptionId);
+
+  let nextDate = new Date();
+  if (subscription.frequency === "weekly") {
+    nextDate.setDate(nextDate.getDate() + 7);
+  } else if (subscription.frequency === "monthly") {
+    nextDate.setMonth(nextDate.getMonth() + 1);
+  } else if (subscription.frequency === "yearly") {
+    nextDate.setFullYear(nextDate.getFullYear() + 1);
+  }
+
+  subscription.expireyDate = nextDate;
+  await subscription.save();
+
+   await sendPaymentSuccessEmail(user, subscription);
+   console.log(`payment success email is sent to ${user.email}`);
 
    res.status(200).json({ message: "payment is successful" });
-
-   const subscription = await submodel.findById(subscriptionId);
-
-   let nextDate = new Date();
-   if (subscription.frequency === "weekly") {
-     nextDate.setDate(nextDate.getDate() + 7);
-   } else if (subscription.frequency === "monthly") {
-     nextDate.setMonth(nextDate.getMonth() + 1);
-   } else if (subscription.frequency === "yearly") {
-     nextDate.setFullYear(nextDate.getFullYear() + 1);
-   }
-
-
-   
-
-  subscription.expireyDate = nextDate ;
-  await subscription.save();
 });
 
 

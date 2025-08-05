@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Payment Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2e7d32;
+        }
+
+        .details {
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 13px;
+            color: #888888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>🎉 Payment Successful!</h2>
+        <p>Hi {{userName}},</p>
+        <p>Your payment for <strong>{{subName}}</strong> has been successfully processed.</p>
+
+        <div class="details">
+            <p><strong>Amount Paid:</strong> ₹{{amount}}</p>
+            <p><strong>Subscription:</strong> {{subName}}</p>
+            <p><strong>Next Billing Date:</strong> {{nextDate}}</p>
+            <p><strong>Status:</strong> Paid ✅</p>
+        </div>
+
+        <p>Thank you for using Subscription Tracker!</p>
+
+        <div class="footer">
+            <p>&copy; 2025 SubTrack. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

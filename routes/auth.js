@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
-const {registerUser,loginUser} = require("../controller/authController");
+const {registerUser,loginUser,updateCredentials} = require("../controller/authController");
+const authMiddleware = require("../middleware/auth/authMiddleware");
 
 
 
@@ -8,6 +9,7 @@ const {registerUser,loginUser} = require("../controller/authController");
 
 router.post('/register',registerUser);
 router.post('/login',loginUser);
+router.put('/update',authMiddleware,updateCredentials);
 
 
 module.exports = router;

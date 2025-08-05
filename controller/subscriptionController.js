@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const validSubscription = require("../validations/subscriptionValidation");
 
 const createSubsciption = asyncHandler(async (req, res) => {
-  const { subName, amount, frequency, expireyDate, category } = req.body;
+  const { subName, amount, frequency, category } = req.body;
   // extracting the id part from the user
   const { _id } = req.user;
 
@@ -12,7 +12,6 @@ const createSubsciption = asyncHandler(async (req, res) => {
     subName,
     amount,
     frequency,
-    expireyDate,
     category,
     user: _id,
   });

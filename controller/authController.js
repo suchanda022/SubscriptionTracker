@@ -1,8 +1,11 @@
 const User = require("../model/user.js");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const { errorhandler, notFound } = require("../middleware/errorHandler");
+const asyncHandler = require("express-async-handler");
 
 const {registerValidation}  = require("../validations/registerValidation");
+
 
 const registerUser = async(req,res)=>{
     const {error} = registerValidation(req.body);
@@ -66,4 +69,27 @@ const loginUser = async(req,res)=>{
     token,
   });
 };
-module.exports = { registerUser,loginUser };
+
+
+const updateCredentials = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const updated = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: req.body, // only safe if you're validating input before this
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!updated) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.status(200).json({
+    message: "Credentials updated successfully",
+    user:updated
+  });
+});
+
+module.exports = { registerUser, loginUser, updateCredentials };
