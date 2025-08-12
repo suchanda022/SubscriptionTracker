@@ -5,10 +5,14 @@ const path = require("path");
 
 const sendEmail = async ({ to, subject, templateName, placeholders = {} }) => {
   try {
+   
+
     const templatePath = path.join(__dirname, "..", "emails", templateName);
+    
+
     let emailHtml = fs.readFileSync(templatePath, "utf-8");
 
-    // Dynamically replace all placeholders like {{userName}}, {{amount}}, etc.
+    // Replace placeholders {{key}} with actual values
     Object.keys(placeholders).forEach((key) => {
       const regex = new RegExp(`{{${key}}}`, "g");
       emailHtml = emailHtml.replace(regex, placeholders[key]);
@@ -26,7 +30,7 @@ const sendEmail = async ({ to, subject, templateName, placeholders = {} }) => {
       from: `"Subscription Tracker" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      html: emailHtml,
+      html: emailHtml, // ✅ use the processed HTML
     });
 
     console.log(`✅ Email sent to ${to}`);
@@ -36,6 +40,7 @@ const sendEmail = async ({ to, subject, templateName, placeholders = {} }) => {
 };
 
 module.exports = sendEmail;
+
 
 
 

@@ -5,7 +5,7 @@ const { errorhandler, notFound } = require("../middleware/errorHandler");
 const simulatePayment = require("../utils/mockPayment");
 const submodel  = require("../model/subscriptions");
 const sendEmail = require("../utils/sendEmails");
-const User = require("../model/user");
+
 
 
 

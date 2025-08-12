@@ -6,6 +6,7 @@ const submodel = require("../model/subscriptions");
 
 
 
+
 // // Debug helper - run this once manually (call it from a route or from top-level)
 // async function debugReminderQuery() {
 //   const today = new Date();
@@ -73,15 +74,17 @@ const runReminderCron = async() => {
         return;
       }
 
+
+
       for (let subscription of subscriptions) {
         await sendEmail({
           to: subscription.user.email,
            subject: "Subscription Expiry Reminder",
            templateName: "reminderEmail.html", // file inside your /emails folder
            placeholders: {
-            userName: subscription.user.name,
-           amount: subscription.amount,
-           expiryDate: subscription.expirey.toDateString()
+           firstName: subscription.user.firstName,
+           subName: subscription.subName,
+           expirey: subscription.expirey.toDateString()
           }
 
         });
