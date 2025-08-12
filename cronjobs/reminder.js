@@ -45,7 +45,7 @@ const submodel = require("../model/subscriptions");
 
 const runReminderCron = async() => {
   // Run every day at 9:00 AM
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("0 9 * * *", async () => {
     console.log("⏰ Running daily reminder email job...");
 
      const today = new Date();
