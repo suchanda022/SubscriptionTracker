@@ -10,14 +10,14 @@ const subscriptionSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: true,
-      min: 50,
+      min: 19,
     },
     frequency: {
       type: String,
       enum: ["weekly", "monthly", "yearly"],
       required: true,
     },
-    expireyDate: {
+    expirey: {
       type: Date,
     },
     category: {

@@ -25,7 +25,7 @@ const createSubsciption = asyncHandler(async (req, res) => {
     category,
     startDate,
     user: userId,
-    expiry
+    expirey : expiry
   });
 
 
