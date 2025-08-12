@@ -29,7 +29,7 @@ app.use("/api/auth", authRoute);
 
 app.use("/api/sub", subRoute);
 
-app.use("/api/payments", paymentRoute);
+//app.use("/api/payments", paymentRoute);
 
 app.use(errorHandler);
 app.use(notFound);

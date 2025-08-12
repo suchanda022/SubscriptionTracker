@@ -36,7 +36,14 @@ const createPayment = asyncHandler(async(req,res)=>{
   });
   const subscription = await submodel.findById(subscriptionId);
 
-  let nextDate = new Date();
+  // let startDate = new Date(subscription.startDate);
+  // let nextDate = new Date(startDate);
+
+   let nextDate = new Date(subscription.startDate);
+
+  
+
+
   if (subscription.frequency === "weekly") {
     nextDate.setDate(nextDate.getDate() + 7);
   } else if (subscription.frequency === "monthly") {

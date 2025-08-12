@@ -19,19 +19,22 @@ const subscriptionSchema = new mongoose.Schema(
     },
     expireyDate: {
       type: Date,
-      
     },
     category: {
       type: String,
       enum: ["entertainment", "education", "fitness", "cooking", "others"],
       default: "others",
     },
-   user: {
-   type: mongoose.Schema.Types.ObjectId,
-   ref: "User",
-   required: true
-}
-    
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+
+    }
   },
   {
     timestamps: true,

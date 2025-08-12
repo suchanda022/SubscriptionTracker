@@ -2,19 +2,32 @@ const submodel = require("../model/subscriptions");
   const { errorhandler, notFound } = require("../middleware/errorHandler");
 const asyncHandler = require("express-async-handler");
 const validSubscription = require("../validations/subscriptionValidation");
+const calculateExpiryDate = require("../utils/calculateexpiry");
 
 const createSubsciption = asyncHandler(async (req, res) => {
-  const { subName, amount, frequency, category } = req.body;
+  const userId = req.user._id;
+  const { subName, amount, frequency, category,startDate } = req.body;
   // extracting the id part from the user
-  const { _id } = req.user;
+
+  const exists = await submodel.findOne({
+  user: userId, 
+  subName: subName.trim().toLowerCase() 
+ 
+
+  });
+  if(exists) return res.status(400).json({message:"duplicate subscription"});
+  const expiry =  calculateExpiryDate(startDate,frequency);
 
   const subscription = new submodel({
     subName,
     amount,
     frequency,
     category,
-    user: _id,
+    startDate,
+    user: userId,
+    expiry
   });
+
 
   const createdSub = await subscription.save();
 
@@ -46,8 +59,9 @@ const updateSubscription = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user._id;
  
-  const updated = await submodel.findByIdAndUpdate(
-    { _id: id, user: userId },
+  console.log(userId);
+  const updated = await submodel.findOneAndUpdate(
+    { _id : id, user: userId },
     req.body,
     { new: true, runValidators: true }
   );
@@ -58,10 +72,12 @@ const updateSubscription = asyncHandler(async (req, res) => {
     message: "it's updated",
     subscription: updated,
   });
+
+  re
 });
 
 const deleteSubscription = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.user;
   const userId = req.user._id;
 
   const deleted = await submodel.findByIdAndDelete({ _id: id, user: userId });

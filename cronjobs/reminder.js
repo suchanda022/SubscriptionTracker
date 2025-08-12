@@ -2,6 +2,7 @@ const cron = require("node-cron");
 const Subscription = require("../model/subscriptions");
 const User = require("../model/user");
 const sendEmail = require("../utils/sendEmails");
+const submodel = require("../model/subscriptions");
 
 
 const runReminderCron = () => {
@@ -9,15 +10,21 @@ const runReminderCron = () => {
   cron.schedule("0 9 * * *", async () => {
     console.log("⏰ Running daily reminder email job...");
 
-    const today = new Date();
-    const targetDate = new Date(today);
+     const today = new Date();
+     const targetDate = new Date(today);
+  
     targetDate.setDate(today.getDate() + 3); // Reminder 3 days before expiry
 
     targetDate.setHours(0, 0, 0, 0); // Set to 00:00 of target day
     const nextDay = new Date(targetDate.getTime() + 24 * 60 * 60 * 1000);
+    
+  console.log("🔍 Cron is checking subscriptions expiring between:");
+  console.log("    👉 From:", targetDate.toISOString());
+  console.log("    👉 To:  ", nextDay.toISOString());
+
 
     try {
-      const subscriptions = await Subscription.find({
+      const subscriptions = await submodel.find({
         expiryDate: {
           $gte: targetDate,
           $lt: nextDay,
