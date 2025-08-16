@@ -1,9 +1,16 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { string } = require("joi");
 
 
 const userSchema = new mongoose.Schema({
+  role:{
+    type:String,
+    enum:['user','admin'],
+    default:'user'
+
+  },
   firstName: {
     required: [true, "first name is rquired"],
     type: String,
@@ -37,7 +44,7 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
 };
 
 userSchema.methods.generateToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_KEY, { expiresIn: "20d" });
+  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_KEY, { expiresIn: "20d" });
 };
 const User = mongoose.model("User", userSchema);
 module.exports = User;

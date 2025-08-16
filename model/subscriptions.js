@@ -1,4 +1,5 @@
 
+const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const subscriptionSchema = new mongoose.Schema(
@@ -33,8 +34,16 @@ const subscriptionSchema = new mongoose.Schema(
     startDate: {
       type: Date,
       required: true,
+    
+
+    },
+    status:{
+      type:String,
+      enum :['active','expired','cancelled'],
+      default:'active'
 
     }
+
   },
   {
     timestamps: true,
