@@ -41,19 +41,33 @@ const createSubsciption = asyncHandler(async (req, res) => {
 
 const fetchSubscription = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const found = await submodel.find({ user: _id });
-  
-  if (!found) {
-    const error = new Error("subscription not found");
+  const { search } = req.query; // optional
+
+  // base query
+  let query = { user: _id };
+
+  // if search term is given, add OR condition for name and category
+  if (search && search.trim() !== "") {
+    query.$or = [
+      { subName: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const found = await submodel.find(query);
+
+  if (!found || found.length === 0) {
+    const error = new Error("No subscriptions found");
     error.statusCode = 404;
     throw error;
   }
-  
+
   res.status(200).json({
     message: "Subscriptions fetched successfully",
     subscription: found,
   });
 });
+
 
 const updateSubscription = asyncHandler(async (req, res) => {
   const { id } = req.params;
