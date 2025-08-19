@@ -4,7 +4,9 @@ const dbConnect = require("./config/db");
 const authRoute = require("./routes/auth");
 const subRoute = require("./routes/subscription");
 const paymentRoute = require("./routes/payment");
+const dashBoardRoutes = require("./routes/adminRoutes");
 const { runReminderCron} = require("./cronjobs/reminder");
+
 
 
 const { errorHandler, notFound } = require("./middleware/errorHandler");
@@ -28,6 +30,7 @@ app.use("/api/auth", authRoute);
 // sub route
 
 app.use("/api/sub", subRoute);
+app.use("/api/admin",dashBoardRoutes);
 
 //app.use("/api/payments", paymentRoute);
 

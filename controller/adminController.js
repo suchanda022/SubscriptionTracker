@@ -8,8 +8,8 @@ const submodel = require('../model/subscriptions');
 const getDashboardStats = asyncHandler(async(req,res)=>{
   const totalUsers = await User.countDocuments();
   const totalSubscriptions = await submodel.countDocuments();
-  const activeSubscriptions = await submodel.collection({status:'active'});
-   const upcomingRenewals = await Subscription.find({
+  const activeSubscriptions = await submodel.countDocuments({status:'active'});
+   const upcomingRenewals = await  submodel.find({
      expiryDate: {
        $gte: new Date(),
        $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -25,5 +25,6 @@ const getDashboardStats = asyncHandler(async(req,res)=>{
    
 
 })
+module.exports = getDashboardStats;
 
 

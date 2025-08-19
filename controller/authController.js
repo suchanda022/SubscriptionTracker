@@ -30,6 +30,7 @@ const registerUser = async(req,res)=>{
       email: req.body.email,
       phone:req.body.phone,
       password: hashedPassword,
+      
     });
   
   try {
@@ -46,13 +47,13 @@ const registerUser = async(req,res)=>{
 
 const loginUser = async(req,res)=>{
   const { email, password } = req.body;
-
+  console.log("login attempt",email);
   const userFound = await User.findOne({ email });
+  console.log(userFound);
   if (!userFound) {
     throw new Error("no user found");
   }
-
-
+  
 
   const passwordMatched = await userFound.isPasswordMatched(password);
 
