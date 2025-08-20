@@ -2,7 +2,7 @@ const submodel = require("../model/subscriptions");
   const { errorhandler, notFound } = require("../middleware/errorHandler");
 const asyncHandler = require("express-async-handler");
 const validSubscription = require("../validations/subscriptionValidation");
-const calculateExpiryDate = require("../utils/calculateexpiry");
+const {calculateExpiryDate,getStatus} = require("../utils/calculateexpiry");
 
 const createSubsciption = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -18,6 +18,7 @@ const createSubsciption = asyncHandler(async (req, res) => {
   if(exists) return res.status(400).json({message:"duplicate subscription"});
   const expiry =  calculateExpiryDate(startDate,frequency);
 
+
   const subscription = new submodel({
     subName,
     amount,
@@ -25,7 +26,8 @@ const createSubsciption = asyncHandler(async (req, res) => {
     category,
     startDate,
     user: userId,
-    expirey : expiry
+    expirey : expiry,
+    status:getStatus
   });
 
 
@@ -41,10 +43,18 @@ const createSubsciption = asyncHandler(async (req, res) => {
 
 const fetchSubscription = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { search } = req.query; // optional
+  const { search,status,category,minAmount,maxAmount } = req.query; // optional
 
   // base query
   let query = { user: _id };
+
+
+  const filters = {  // basically object.assign merges them in mongodb query 
+    ...(status && {status}),
+    ...(category && {category}),
+     ...(minAmount && maxAmount && { amount: { $gte: Number(minAmount), $lte: Number(maxAmount) } }),
+  }
+  Object.assign(query,filters);
 
   // if search term is given, add OR condition for name and category
   if (search && search.trim() !== "") {
@@ -57,9 +67,7 @@ const fetchSubscription = asyncHandler(async (req, res) => {
   const found = await submodel.find(query);
 
   if (!found || found.length === 0) {
-    const error = new Error("No subscriptions found");
-    error.statusCode = 404;
-    throw error;
+    return res.status(404).json({message:"not found"});
   }
 
   res.status(200).json({

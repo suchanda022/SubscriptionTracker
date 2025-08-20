@@ -12,4 +12,8 @@ function calculateExpiryDate(startDate,frequency){
   return date;
 }
 
-module.exports = calculateExpiryDate;
+function getStatus(date){
+  return expiry < new Date()?"expirey":"active";
+}
+
+module.exports = {calculateExpiryDate, getStatus};

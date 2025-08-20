@@ -20,6 +20,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
     expirey: {
       type: Date,
+
     },
     category: {
       type: String,
@@ -39,7 +40,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
     status:{
       type:String,
-      enum :['active','expired','cancelled'],
+      enum :['active','expired'],
       default:'active'
 
     }
