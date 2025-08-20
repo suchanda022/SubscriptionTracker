@@ -43,7 +43,7 @@ const createSubsciption = asyncHandler(async (req, res) => {
 
 const fetchSubscription = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { search,status,category,minAmount,maxAmount } = req.query; // optional
+  const { search,status,category,minAmount,maxAmount,sortBy,sortOrder} = req.query; // optional
 
   // base query
   let query = { user: _id };
@@ -63,8 +63,14 @@ const fetchSubscription = asyncHandler(async (req, res) => {
       { category: { $regex: search, $options: "i" } },
     ];
   }
+  let sort = {};
+  if(sortBy){
+     if (sortBy) {
+       sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+     }
+  }
 
-  const found = await submodel.find(query);
+  const found = await submodel.find(query).sort(sort);
 
   if (!found || found.length === 0) {
     return res.status(404).json({message:"not found"});
