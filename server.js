@@ -6,6 +6,7 @@ const subRoute = require("./routes/subscription");
 const paymentRoute = require("./routes/payment");
 const dashBoardRoutes = require("./routes/adminRoutes");
 const { runReminderCron} = require("./cronjobs/reminder");
+const analyticsRoute = require("./routes/analytics");
 
 
 
@@ -31,7 +32,7 @@ app.use("/api/auth", authRoute);
 
 app.use("/api/sub", subRoute);
 app.use("/api/admin",dashBoardRoutes);
-
+app.use("/api/analytics",analyticsRoute);
 //app.use("/api/payments", paymentRoute);
 
 app.use(errorHandler);
