@@ -43,17 +43,26 @@ const createSubsciption = asyncHandler(async (req, res) => {
 
 const fetchSubscription = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { search,status,category,minAmount,maxAmount,sortBy,sortOrder} = req.query; // optional
+  const { search,status,category,minAmount,maxAmount,sortBy,sortOrder,page = 1, limit = 10} = req.query; 
+  const pageNumber = Math.max(1,parseInt(page) ||1);
+  const pageSize = Math.min(50,Math.max(1,parseInt(limit) || 10));
+  const skip = (pageNumber - 1) * pageSize;
 
   // base query
   let query = { user: _id };
 
 
-  const filters = {  // basically object.assign merges them in mongodb query 
-    ...(status && {status}),
-    ...(category && {category}),
-     ...(minAmount && maxAmount && { amount: { $gte: Number(minAmount), $lte: Number(maxAmount) } }),
-  }
+  const filters = {
+    // basically object.assign merges them in mongodb query
+    ...(status && { status }),
+    ...(category && { category }),
+    ...(minAmount && {
+      amount: { ...(query.amount || {}), $gte: Number(minAmount) },
+    }),
+    ...(maxAmount && {
+      amount: { ...(query.amount || {}), $lte: Number(maxAmount) },
+    }),
+  };
   Object.assign(query,filters);
 
   // if search term is given, add OR condition for name and category
@@ -63,22 +72,38 @@ const fetchSubscription = asyncHandler(async (req, res) => {
       { category: { $regex: search, $options: "i" } },
     ];
   }
-  let sort = {};
-  if(sortBy){
-     if (sortBy) {
+  let sort =  {createdAt:-1};
+   if (sortBy) {
        sort[sortBy] = sortOrder === "desc" ? -1 : 1;
-     }
-  }
+    }
+  
 
-  const found = await submodel.find(query).sort(sort);
+const[subscriptions,totalCount]=  await Promise.all([submodel.find(query).sort(sort).skip(skip).limit(pageSize).lean(),
+  submodel.countDocuments(query)
+])
 
-  if (!found || found.length === 0) {
+  if (!subscriptions || totalCount === 0) {
     return res.status(404).json({message:"not found"});
   }
+  const totalPages = Math.ceil(totalCount/pageSize);
+  const hasNextpage = pageNumber < totalPages;
+  const hasprevPage = pageNumber>1;
 
   res.status(200).json({
     message: "Subscriptions fetched successfully",
-    subscription: found,
+    data: {
+      subscriptions,
+      pagination: {
+        currentPage: pageNumber,
+        totalPages,
+        totalCount,
+        pageSize,
+        hasNextpage,
+        hasprevPage,
+        startIndex: skip + 1,
+        endIndex: Math.min(skip + pageSize, totalCount),
+      }
+    }
   });
 });
 

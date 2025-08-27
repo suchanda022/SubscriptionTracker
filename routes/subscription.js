@@ -7,6 +7,6 @@ const authMiddleware = require("../middleware/auth/authMiddleware")
 
 router.post("/add",authMiddleware, createSubsciption);
 router.get("/showSubs", authMiddleware, fetchSubscription);
-router.patch("/updated/:id", authMiddleware,updateSubscription);
-router.delete("/deleted",authMiddleware,deleteSubscription);
+router.patch("/update/:id", authMiddleware,updateSubscription);
+router.delete("/delete",authMiddleware,deleteSubscription);
 module.exports = router;
