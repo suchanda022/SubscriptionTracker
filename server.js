@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const cors = require('cors');
 const dbConnect = require("./config/db");
 const authRoute = require("./routes/auth");
 const subRoute = require("./routes/subscription");
@@ -7,6 +8,7 @@ const paymentRoute = require("./routes/payment");
 const dashBoardRoutes = require("./routes/adminRoutes");
 const { runReminderCron} = require("./cronjobs/reminder");
 const analyticsRoute = require("./routes/analytics");
+const swaggerDocs = require("./config/swagger");
 
 
 
@@ -34,12 +36,16 @@ app.use("/api/sub", subRoute);
 app.use("/api/admin",dashBoardRoutes);
 app.use("/api/analytics",analyticsRoute);
 //app.use("/api/payments", paymentRoute);
+swaggerDocs(app);
 
 app.use(errorHandler);
 app.use(notFound);
+
 
 app.get("/", (req, res) => {
   res.send("welcome to subscription tracker api");
 });
 
+
 app.listen(3000, () => console.log("server up running"));
+

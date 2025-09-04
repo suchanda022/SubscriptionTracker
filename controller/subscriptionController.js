@@ -18,7 +18,8 @@ const createSubsciption = asyncHandler(async (req, res) => {
   if(exists) return res.status(400).json({message:"duplicate subscription"});
   const expiry =  calculateExpiryDate(startDate,frequency);
 
-
+ 
+ 
   const subscription = new submodel({
     subName,
     amount,
@@ -26,8 +27,8 @@ const createSubsciption = asyncHandler(async (req, res) => {
     category,
     startDate,
     user: userId,
-    expirey : expiry,
-    status:getStatus
+    expirey: expiry,
+    status: getStatus(expiry)   // call the function  , dont  pass the function it self 
   });
 
 

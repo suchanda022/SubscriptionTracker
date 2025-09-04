@@ -32,13 +32,24 @@ const registerUser = async(req,res)=>{
       password: hashedPassword,
       
     });
+    
   
   try {
     const savedUser = await user.save();
-    res.send({user: savedUser._id});
+    res.status(200).json({
+      message: "user registered successfully",
+      user: {
+        id: savedUser._id,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        email: savedUser.email,
+        phone: savedUser.phone,
+      },
+    });
     
-  } catch (error) {
-    res.status(400).send(error);
+    
+  } catch (err) {
+    next(err);
     
   }
 
