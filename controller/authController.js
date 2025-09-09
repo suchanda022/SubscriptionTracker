@@ -5,6 +5,8 @@ const { errorhandler, notFound } = require("../middleware/errorHandler");
 const asyncHandler = require("express-async-handler");
 
 const {registerValidation}  = require("../validations/registerValidation");
+const sendEmail = require("../utils/sendEmails.js");
+const crypto = require("crypto");
 
 
 const registerUser = async(req,res)=>{
@@ -78,7 +80,7 @@ const loginUser = async(req,res)=>{
 };
 
 
-const updateCredentials = asyncHandler(async (req, res) => {
+const editCredits = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const updated = await User.findByIdAndUpdate(
@@ -99,4 +101,85 @@ const updateCredentials = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { registerUser, loginUser, updateCredentials };
+
+// ------------------ FORGOT PASSWORD ------------------
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // Generate raw token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  // Hash token before storing in DB
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Save hashed token and expiry
+  user.resetToken = hashedToken;
+  user.resetTokenExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+  await user.save();
+
+  // Send the **raw token** in the reset link
+  const resetUrl = `${process.env.FRONTEND_URL}/api/auth/reset-password/${resetToken}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "Password Reset",
+    templateName: "resetPassword.html",
+    placeholders: {
+      name: user.firstName,
+      resetUrl,
+    },
+  });
+
+  res.json({ message: "Reset email sent successfully" });
+});
+
+// ------------------ RESET PASSWORD ------------------
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  // Hash incoming token to match stored hashed token
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // Find user with matching token and valid expiry
+  const user = await User.findOne({
+    resetToken: hashedToken,
+    resetTokenExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
+
+  // Hash new password
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(password, salt);
+
+  // Clear reset token fields
+  user.resetToken = undefined;
+  user.resetTokenExpiry = undefined;
+
+  await user.save();
+
+  res.json({ message: "Password has been reset successfully" });
+});
+
+module.exports = {
+  forgotPassword,
+  resetPassword,
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  editCredits,
+  forgotPassword,
+  resetPassword,
+};

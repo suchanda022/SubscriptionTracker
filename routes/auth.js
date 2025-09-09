@@ -1,6 +1,12 @@
 const router = require('express').Router();
 
-const {registerUser,loginUser,updateCredentials} = require("../controller/authController");
+const {
+  registerUser,
+  loginUser,
+  editCredits,
+  forgotPassword,
+  resetPassword,
+} = require("../controller/authController");
 const authMiddleware = require("../middleware/auth/authMiddleware");
 /**
  * @swagger
@@ -132,8 +138,13 @@ router.post('/login',loginUser);
 
 
 
-router.put('/update',authMiddleware,updateCredentials);
+ router.put("/update", authMiddleware, editCredits);
+
+ router.post("/forgot-password",forgotPassword);       //using post because involves sending sensitive information
+ router.post("/reset-password/:token",resetPassword);
 
 
-module.exports = router;
+
+
+ module.exports = router;
 

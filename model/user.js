@@ -36,7 +36,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-  }
+  },
+  resetToken: String,          // <--- must exist
+  resetTokenExpiry: Date 
  
 });
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
