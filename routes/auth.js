@@ -63,6 +63,11 @@ const authMiddleware = require("../middleware/auth/authMiddleware");
 
 
 
+router.get("/register", (req, res) => {
+  res.send(
+    "🚀 Use POST method here to register a new user (send JSON in body)."
+  );
+});
 router.post('/register',registerUser);
 
 /**
